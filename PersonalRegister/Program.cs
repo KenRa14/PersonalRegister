@@ -20,40 +20,41 @@ namespace PersonalRegister
                 Console.Clear();
                 Console.WriteLine($"Staff Register\n{getInstructions(hideInstructions, showRecords)}\nrecord count: {records.Count}\n");
 
-                if (!showRecords)
+                if (showRecords)
                 {
-                    Console.Write("Enter data: ");
-                }
-                else
-                {
-                    foreach (var item in records)
+                    if (records.Count > 0)
                     {
-                        Console.WriteLine(item);
+                        foreach (var item in records)
+                        {
+                            Console.WriteLine(item);
+                        }
                     }
-                    Console.WriteLine("\n*To enter records press CTR+S");
+                    else
+                    {
+                        Console.WriteLine("Nothing to show");
+                    }
+                    
                 }
 
                 ConsoleKeyInfo cki;
-                // Prevent example from ending if CTL+C is pressed.
-                Console.TreatControlCAsInput = true;
 
                 do
                 {
                     cki = Console.ReadKey(true);
                     if (cki.Key == ConsoleKey.Escape)
                     {
+
                         _continue = false;
                         break;
                     }
 
-                    if (!showRecords && ((cki.Modifiers & ConsoleModifiers.Control) == 0))
+                    if (((cki.Modifiers & ConsoleModifiers.Control) == 0))
                     {
                         string input = "";
-                        if (cki.Key != ConsoleKey.Enter)
-                        {
-                            input += cki.KeyChar;
-                            Console.Write(input);
+                        if (cki.Key == ConsoleKey.Enter) { 
+                            break;
                         }
+                        Console.Write("Enter data: ");
                         input += Console.ReadLine();
                         input = input.Trim();
 
@@ -101,14 +102,25 @@ namespace PersonalRegister
 
                     if (word.StartsWith('"'))
                     {
-                        word = word[1..];
+                       
+                        if (word.EndsWith("\""))
+                        {
+                            name = word.Substring(1, word.Length-2);
+                            i++;
+                            break;
+                        }
+                        else
+                        {
+                            word = word[1..];
+                        }
                     }
                     else if (word.EndsWith("\""))
                     {
                         name += word.Substring(0, word.Length-1);
+                        i++;
                         break;
                     }
-                    name += word;
+                    name += word + " ";
 
                 }
             }
@@ -127,7 +139,8 @@ namespace PersonalRegister
         public static string getInstructions(bool hideInstructions, bool showRecords)
         {
             string keyInstructions = $"*{(hideInstructions ? "To show instructions press CTR+I" : "To hide instructions press CTR+I")}" +
-                $"{(showRecords ? "": ", to show records press CTR+S")}, to exit press ESC\n";
+                $"{(showRecords ? ", to hide records press CTR+S" : ", to show records press CTR+S")}, to exit press ESC" +
+                $"\n*To enter data press anything else\n";
             if (hideInstructions)
             {
                 return keyInstructions;
@@ -135,7 +148,7 @@ namespace PersonalRegister
             return "*Instructions" +
                 "\n*Follow the next syntax inside []: [name salary] and then press enter." +
                 "\n*if name is separated by white spaces, surround it with \"." +
-                "\n*Examples:\n  Vita 1.200\n  \"Ash Ketchum\" 65.536,50\n" + keyInstructions;
+                $"\n*Examples:\n  Vita 1.200\n  \"Ash Ketchum\" {65536.50:N2}\n" + keyInstructions;
         }
     }
     public class Staff
